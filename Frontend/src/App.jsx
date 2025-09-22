@@ -8,6 +8,7 @@ import { useAuth } from "./context/AuthProvider";
 import CreateBook from "./components/CreateBook";
 import MyBooks from "./components/MyBooks";
 import MyShelf from "./components/MyShelf";
+import Book from "./components/Book";
 
 function App() {
   const [authUser, setAuthUser] = useAuth();
@@ -34,6 +35,7 @@ function App() {
             element={<MyShelf />}
           />
           <Route path="/signup" element={<Signup />} />
+          <Route path="/book/:bookid" element={<Book />} />
         </Routes>
         <Toaster />
       </div>

@@ -9,6 +9,8 @@ function Cards({ item, isMyBook }) {
     const userId = uid._id 
     console.log(userId);
     const bookId = item._id
+
+    
     await axios
       .post("http://localhost:4001/book/buybook", {userId, bookId})
       .then((res) => {

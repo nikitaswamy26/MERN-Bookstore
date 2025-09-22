@@ -25,10 +25,10 @@ function Course() {
             <span className="text-pink-500"> Here! :)</span>
           </h1>
           <p className="mt-12">
-            Buy New Books or Add Yours!!
+            Buy New Books!!
           </p>
           
-          <Link to="/createbook">
+          {/* <Link to="/createbook">
             <button className="mt-6 bg-pink-500 text-white px-4 py-2 rounded-md hover:bg-pink-700 duration-300 mx-2">
               + Create a book
             </button>
@@ -37,7 +37,7 @@ function Course() {
             <button className="mt-6 bg-pink-500 text-white px-4 py-2 rounded-md hover:bg-pink-700 duration-300">
               Back
             </button>
-          </Link>
+          </Link> */}
         </div>
         <div className="mt-12 grid grid-cols-1 md:grid-cols-4">
           {book.map((item) => (

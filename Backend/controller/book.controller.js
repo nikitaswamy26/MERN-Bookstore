@@ -1,3 +1,4 @@
+import mongoose from "mongoose";
 import Book from "../model/book.model.js";
 import User from "../model/user.model.js";
 
@@ -28,7 +29,9 @@ export const getBoughtBooks = async(req, res) => {
              .populate('booksBought')  // Populating the books array with actual book documents
              .exec()
 
-        console.log(user.booksBought);
+             
+
+        // console.log(user.booksBought);
         return res.status(200).json({
             books: user.booksBought
         })
@@ -105,9 +108,44 @@ export const deletebook = async (req, res) => {
         await Book.deleteOne({
             _id: bookId
         })
-        return res.status(200).json({ message: "Book purchased successfully" });
+        return res.status(200).json({ message: "Book deleted successfully" });
     } catch (error) {
         
         return res.status(500).json({ message: "Server error", error: error.message });
     }
 };
+
+
+export const removeBook = async (req, res) => {
+    const { bookid, userid } = req.body;
+
+try {
+  // Find the user by id (userid)
+  const user = await User.findById(userid);
+
+  if (!user) {
+    return res.status(404).json({ message: "User not found" });
+  }
+
+  // Check if the bookid exists in the user's boughtBooks array
+  const bookIndex = user.booksBought.indexOf(new mongoose.Types.ObjectId(bookid));
+
+  if (bookIndex === -1) {
+    console.log(user.booksBought, bookid);
+    
+    return res.status(400).json({ message: "Book not found in user's boughtBooks" });
+  }
+
+  // Remove the bookid from the boughtBooks array
+  user.booksBought.splice(bookIndex, 1);
+
+  // Save the updated user document back to the database
+  await user.save();
+
+  return res.status(200).json({ message: "Book successfully removed from user's boughtBooks" });
+} catch (error) {
+  console.error(error);
+  return res.status(500).json({ message: "An error occurred", error });
+}
+
+}

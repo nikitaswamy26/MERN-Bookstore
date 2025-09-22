@@ -3,12 +3,58 @@ import { useState } from "react";
 import Login from "./Login";
 import Logout from "./Logout";
 import { useAuth } from "../context/AuthProvider";
+import axios from "axios"
+import toast from "react-hot-toast";
+import { Link } from "react-router-dom";
+
 
 function Navbar() {
   const [authUser, setAuthUser] = useAuth();
+  const [search, setSearch] = useState("")
+  const [searchedBooks, setSearchedBooks] = useState([])
   const [theme, setTheme] = useState(
     localStorage.getItem("theme") ? localStorage.getItem("theme") : "light"
   );
+
+  const buyNow = async (item) => {
+    const user = localStorage.getItem("Users")
+    const uid = await JSON.parse(user)
+    const userId = uid._id 
+    console.log(userId);
+    const bookId = item._id
+
+    
+    await axios
+      .post("http://localhost:4001/book/buybook", {userId, bookId})
+      .then((res) => {
+        console.log(res.data);
+        if (res.data) {
+          toast.success("Book Bought Successfully");
+        }
+      })
+      .catch((err) => {
+        if (err.response) {
+          console.log(err);
+          toast.error("Error: " + err.response.data.message);
+        }
+      });
+  }
+ useEffect(()=>{
+  const fetchBooks = async () => {
+    if(!search) return []
+    const data = await axios.get("http://localhost:4001/book/")
+    console.log(data.data);
+    
+    if(data)
+    setSearchedBooks(data.data.filter((book) => { 
+      if(book.title && book.title.toLowerCase().includes(search.toLowerCase())){
+          return book
+      }
+    }))
+  }
+  fetchBooks()
+ },[search])
+
   const element = document.documentElement;
   useEffect(() => {
     if (theme === "dark") {
@@ -44,11 +90,11 @@ function Navbar() {
       <li>
         <a href="/course">Books</a>
       </li>
-      <li>
+      {/* <li>
         <a href="/mybooks">My Books</a>
-      </li>
+      </li> */}
       <li>
-        <a href="/myshelf">My Shelf</a>
+        <a href="/myshelf">Cart</a>
       </li>
     </>
   );
@@ -103,6 +149,9 @@ function Navbar() {
                   type="text"
                   className="grow outline-none rounded-md px-1 dark:bg-slate-900 dark:text-white"
                   placeholder="Search"
+                  onChange={(e)=>{
+                    setSearch(e.target.value)
+                  }}
                 />
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -117,6 +166,32 @@ function Navbar() {
                   />
                 </svg>
               </label>
+              {
+                searchedBooks && search.length > 0 && <div style={{
+                  padding:10,
+                  background:"#fff",
+                  borderRadius:10,
+                  marginBlock: 10
+                }}>
+                  {
+                    searchedBooks.map(book => (
+                      <div style={{
+                        borderBottom:"1px solid #000",
+                        display:"flex",
+                        justifyContent:"space-between",
+                        padding:10
+                      }} key={book._id}>
+                        
+                        <a href={"/book/"+book._id} style={{
+                          color:"#000"
+                        }}>{book.title}</a>
+                        
+                        
+                        </div>
+                    ))
+                  }
+                </div>
+              }
             </div>
             <label className="swap swap-rotate">
               {/* this hidden checkbox controls the state */}

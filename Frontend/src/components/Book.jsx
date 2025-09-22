@@ -5,12 +5,12 @@ import Footer from './Footer'
 import axios from 'axios'
 import Cards from './Cards'
 import toast from 'react-hot-toast'
-import { Link } from 'react-router-dom'
+import { Link, useParams, useSearchParams } from 'react-router-dom'
 
-const MyShelf = () => {
+const Book = () => {
+    const params = useParams()
     const [book, setBook] = useState([]);
     const [bookPrice, setBookPrice] = useState(0);
-    // const userId = JSON.parse(localStorage.getItem("Users") || "")
   useEffect(() => {
     const getBook = async () => {
     const user = await JSON.parse(localStorage.getItem("Users") || "")
@@ -20,11 +20,10 @@ const MyShelf = () => {
     }
     const uid = user._id
       try {
-        const res = await axios.post("http://localhost:4001/book/boughtbooks",{
-            userId: uid
-        });
-      
-        setBook(res.data.books);
+        const res = await axios.get("http://localhost:4001/book/");
+       
+        
+        setBook(res.data.filter(book => book._id == params.bookid));
         
       } catch (error) {
         console.log(error);
@@ -40,22 +39,6 @@ const MyShelf = () => {
   setBookPrice(newPrice)
  },[book])
   
- const deleteBook = async (bookid) => {
-  const user = await JSON.parse(localStorage.getItem("Users") || "")
-    if(!user){
-      toast.error("Error: Invalid Author");
-      return 
-    }
-    const uid = user._id
-
-    await axios.post("http://localhost:4001/user/removeBook",{
-      bookid: bookid,
-      userid: uid
-    })
-    toast.error("Book Removed");
-
- }
-
   return (
     <>
     <Navbar />
@@ -63,25 +46,17 @@ const MyShelf = () => {
         <div className='mt-12 px-4'>
         <Link to="/course">
             <button className="mt-8 bg-pink-500 text-white px-4 py-2 rounded-md hover:bg-pink-700 duration-300 mx-2">
-                Explore Books
+                 Back
             </button>
           </Link>
         </div>
         <div className="mt-6 grid grid-cols-1 md:grid-cols-4">
           {book.map((item) => (
-          <div style={{
-            display:"flex",
-            flexDirection:"column"
-          }}>
             <Cards broughtBook key={item.id} item={item} />
-            <button onClick={()=>{
-              deleteBook(item._id)
-            }} className="mt-8 bg-pink-500 text-white px-4 py-2 rounded-md hover:bg-pink-700 duration-300 mx-2">Remove</button>
-            </div>
           ))}
         </div>
 
-        <div style={{
+        {/* <div style={{
           width:"50%",
           marginInline:"auto",
           padding:20
@@ -114,7 +89,7 @@ const MyShelf = () => {
                 Pay Now
             </button>
           </div>
-        </div>
+        </div> */}
         
       
           
@@ -124,4 +99,4 @@ const MyShelf = () => {
   )
 }
 
-export default MyShelf
+export default Book
